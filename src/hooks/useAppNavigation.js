@@ -8,7 +8,6 @@ const useAppNavigation = () => {
   };
 
   const navigateToEventEdit = (eventId) => {
-    console.log("to event edit of: "+eventId)
     navigation.navigate("View Event", { screen: "Edit", eventId });
   };
 

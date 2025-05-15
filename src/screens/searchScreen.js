@@ -1,12 +1,16 @@
 import { FlatList, TextInput, TouchableOpacity, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { categories, getCategoryValue } from "../data/categories";
-import { eventSampleList } from "../data/eventSampleList";
+import {
+  categories,
+  getCategoryTypeFromValue,
+  getCategoryValueFromLabel,
+} from "../data/categories";
 import EventItem from "../components/eventItem";
 import Text from "../components/text";
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState, memo, useContext } from "react";
 import useAppNavigation from "../hooks/useAppNavigation";
+import { AppContext } from "../../context/AppProvider";
 
 const CategoryItem = memo(({ item, selectedCategory, setSelectedCategory }) => (
   <TouchableOpacity
@@ -46,7 +50,11 @@ function CategoryFlatList({
         };
       }}
       renderItem={({ item }) => (
-        <CategoryItem item={item} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+        <CategoryItem
+          item={item}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
       )}
       className="pt-6"
       showsHorizontalScrollIndicator={false}
@@ -56,11 +64,12 @@ function CategoryFlatList({
 
 export default function SearchScreen() {
   const route = useRoute();
+  const { events, refreshEvents, getEventsByType } = useContext(AppContext);
+  const [eventsShown, setEventsShown] = useState([]);
   const { category } = route.params?.category ?? categories[0].label;
   const [selectedCategory, setSelectedCategory] = useState(category);
   const { navigateToEventEdit } = useAppNavigation();
   const CATEGORIES = categories;
-  const EVENTS = eventSampleList;
   const flatListRef = useRef(null);
 
   const scrollToItem = (index) => {
@@ -79,9 +88,26 @@ export default function SearchScreen() {
   useEffect(() => {
     if (route.params) {
       setSelectedCategory(route.params.category);
-      scrollToItem(getCategoryValue(route.params.category));
+    } else {
+      setSelectedCategory("All");
     }
   }, [route.params]);
+
+  useEffect(() => {
+    const updateEventsShown = async () => {
+      const catValue = getCategoryValueFromLabel(selectedCategory);
+      scrollToItem(catValue);
+      if (selectedCategory == "All") {
+        refreshEvents();
+        setEventsShown(events);
+      } else {
+        const type = getCategoryTypeFromValue(catValue);
+        const newEventsShown = await getEventsByType(type);
+        setEventsShown(newEventsShown);
+      }
+    };
+    updateEventsShown();
+  }, [selectedCategory]);
 
   return (
     <View className="flex-1">
@@ -98,14 +124,14 @@ export default function SearchScreen() {
         <CategoryFlatList
           selectedCategory={selectedCategory}
           setSelectedCategory={(category) => {
-            scrollToItem(getCategoryValue(category))
-            setSelectedCategory(category)
+            scrollToItem(getCategoryValueFromLabel(category));
+            setSelectedCategory(category);
           }}
           data={CATEGORIES}
           ref={flatListRef}
         />
       </View>
-      {EVENTS.length == 0 ? (
+      {eventsShown.length == 0 ? (
         <View className="items-center pt-48 gap-4">
           <View className="bg-pink-200 p-6 rounded-full">
             <MaterialIcons name="calendar-today" size={60} color="#C2185B" />
@@ -116,8 +142,8 @@ export default function SearchScreen() {
         </View>
       ) : (
         <FlatList
-          data={EVENTS}
-          keyExtractor={(item) => item.id}
+          data={eventsShown}
+          keyExtractor={(item) => item._id + item.type}
           renderItem={({ item }) => (
             <EventItem
               item={item}

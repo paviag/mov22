@@ -1,18 +1,25 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useContext } from "react";
 import useDropdown from "./useDropdown";
-import { categories, getCategoryLabel } from "../data/categories";
-import { eventSampleList } from "../data/eventSampleList";
+import { categories, getCategoryTypeFromValue } from "../data/categories";
+import { AppContext } from "../../context/AppProvider";
+import dateParser from "../utils/dateParser";
+import dateFormatter from "../utils/dateFormatter";
 
 const useEventForm = (eventId) => {
+  const { createEvent, updateEvent } = useContext(AppContext);
+  const { getOneEvent } = useContext(AppContext);
   const [eventData, setEventData] = useState({
-    name: "",
-    category: "",
+    title: "",
+    type: "",
     location: "",
     date: new Date(),
-    description: "",
-    maxParticipants: 0,
-    occupiedSpots: 0,
+    details: "",
+    participants: 0,
+    availableSpots: 0,
+    path: "",
+    isJoined: false,
   });
+  const [subscribedNumber, setSubscribedNumber] = useState(0);
   const categoryDropdownProps = useDropdown(categories.slice(1));
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [openTimePicker, setOpenTimePicker] = useState(false);
@@ -37,10 +44,9 @@ const useEventForm = (eventId) => {
       newDate?.setFullYear(date.getFullYear());
       newDate?.setMonth(date.getMonth());
       newDate?.setDate(date.getDate());
-      
+
       return { ...prevData, date: newDate };
     });
-    
   }, []);
 
   const onConfirmTimePicker = useCallback(
@@ -59,22 +65,48 @@ const useEventForm = (eventId) => {
     [eventData.date]
   );
 
-  useEffect(() => {
-    console.log("eventid in use:"+eventId)
+  const handleSubmit = async (eventId) => {
+    // parse event date to
     if (eventId) {
-      setEventData(eventSampleList[eventId]);
-      categoryDropdownProps.setValue(
-        categories.find((e) => e.label === eventSampleList[eventId].category)
-          ?.value
-      );
+      // update existing event
+      await updateEvent({...eventData, date: dateFormatter(eventData.date)});
+    } else {
+      // create new event
+      await createEvent({...eventData, date: dateFormatter(eventData.date)});
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (eventId) {
+        try {
+          const fetchedData = await getOneEvent(eventId);
+          console.log(fetchedData.date)
+          console.log(dateParser(fetchedData.date))
+          console.log("fetched and parsed above")
+          fetchedData.date = dateParser(fetchedData.date);
+          setEventData(fetchedData);
+          setSubscribedNumber(
+            fetchedData.participants - fetchedData.availableSpots
+          );
+          categoryDropdownProps.setValue(
+            categories.find((e) => e.label === fetchedData.type)?.value
+          );
+        } catch (error) {
+          console.error("Error fetching event data:", error);
+        }
+      }
+    };
+
+    fetchEventData();
+  }, [eventId]);
 
   return {
     eventData,
     categoryDropdownProps: {
       ...categoryDropdownProps,
-      onChangeValue: (v) => handleInputChange("category", getCategoryLabel(v)),
+      onChangeValue: (v) =>
+        handleInputChange("type", getCategoryTypeFromValue(v)),
     },
     timePickerProps: {
       visible: openTimePicker,
@@ -86,10 +118,12 @@ const useEventForm = (eventId) => {
       onDismiss: onDismissDatePicker,
       onConfirm: onConfirmDatePicker,
     },
+    subscribedNumber,
     setEventData,
     setOpenDatePicker,
     setOpenTimePicker,
     handleInputChange,
+    handleSubmit
   };
 };
 

@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Text from "./text";
+import capitalize from "../utils/capitalize";
 
 export default function BaseInputComponent({
   name,
@@ -18,7 +19,7 @@ export default function BaseInputComponent({
             color={color == "white" ? color : "#be185d"}
           />
         )}
-        <Text className={`font-bold text-${color}`}>{name}</Text>
+        <Text className={`font-bold text-${color}`}>{capitalize(name)}</Text>
       </View>
       {children}
     </View>

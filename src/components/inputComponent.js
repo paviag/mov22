@@ -1,5 +1,6 @@
 import { TextInput } from "react-native";
 import BaseInputComponent from "./baseInputComponent";
+import capitalize from "../utils/capitalize";
 
 export default function InputComponent({
     name,
@@ -25,11 +26,11 @@ export default function InputComponent({
         <TextInput
           className={`text-lg text-${color} p-3 pt-1 ${styling}`}
           placeholderTextColor={color == "black" ? "lightGray" : "#ffffff70"}
-          placeholder={name}
+          placeholder={capitalize(name)}
           defaultValue={defaultValue?.toString()}
           returnKeyType="next"
           accessibilityLabel={`Event ${name} input field`}
-          keyboardType={typeof defaultValue === "number" ? "numeric" : "default"}
+          keyboardType={typeof defaultValue == "number" ? "numeric" : "default"}
           style={{ fontFamily: "Nunito_400Regular" }}
           multiline={longText}
           numberOfLines={4}

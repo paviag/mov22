@@ -13,6 +13,8 @@ import {
 import useEventForm from "../hooks/useEventForm";
 import InputComponent from "../components/inputComponent";
 import BaseInputComponent from "../components/baseInputComponent";
+import { useContext } from "react";
+import { AppContext } from "../../context/AppProvider";
 registerTranslation("en-GB", enGB);
 
 // id, name, location, date, description, image, available spots, taken spots, image?
@@ -27,8 +29,12 @@ export default function EventForm() {
     setOpenDatePicker,
     setOpenTimePicker,
     handleInputChange,
+    subscribedNumber,
+    handleSubmit
   } = useEventForm(eventId);
-
+  console.log("down in event form")
+  console.log(eventData.date)
+  console.log(eventData.date?.toLocaleDateString())
   return (
     <ScrollView
       className="bg-white"
@@ -43,10 +49,10 @@ export default function EventForm() {
           <View className="bg-pink-300 h-20 w-20 rounded-full absolute top-3 right-32" />
           <View className="w-10/12 flex-1 absolute bottom-7 left-5">
             <InputComponent
-              name="Name"
+              name="title"
               icon="view-headline"
               color="white"
-              defaultValue={eventData.name}
+              defaultValue={eventData.title}
               transparent={true}
               onChange={handleInputChange}
             />
@@ -55,7 +61,7 @@ export default function EventForm() {
         <View className="pl-5 pr-6 pt-7 gap-4">
           <View className="w-full flex-row items-stretch gap-5">
             <InputComponent
-              name="Date"
+              name="date"
               icon="event"
               defaultValue={eventData.date?.toLocaleDateString()}
               onPress={() => setOpenDatePicker(true)}
@@ -63,7 +69,7 @@ export default function EventForm() {
               onChange={handleInputChange}
             />
             <InputComponent
-              name="Time"
+              name="time"
               icon="schedule"
               defaultValue={eventData.date?.toLocaleTimeString("en-GB")}
               onPress={() => setOpenTimePicker(true)}
@@ -72,47 +78,51 @@ export default function EventForm() {
             />
           </View>
           <InputComponent
-            name="Location"
+            name="location"
             icon="location-pin"
             defaultValue={eventData.location}
             onChange={handleInputChange}
           />
           <InputComponent
-            name="Description"
+            name="details"
             icon="description"
-            defaultValue={eventData.description}
+            defaultValue={eventData.details}
             longText={true}
             onChange={handleInputChange}
           />
-          <BaseInputComponent name="Category" icon="category">
+          <BaseInputComponent name="category" icon="category">
             <DropDownPicker
               {...categoryDropdownProps}
               listMode="SCROLLVIEW"
               autoScroll={true}
               dropDownContainerStyle={{
                 backgroundColor: "#f3f4f6",
-                borderWidth: 0
+                borderWidth: 0,
               }}
               disabledStyle={{ borderWidth: 4 }}
               style={{ backgroundColor: "#f3f4f6", borderWidth: 0 }}
               textStyle={{ fontFamily: "Nunito_400Regular", fontSize: 16 }}
             />
-          </BaseInputComponent> 
+          </BaseInputComponent>
           <InputComponent
-            name="Maximum Participants"
+            name="participants"
             icon="loyalty"
-            defaultValue={eventData.maxParticipants}
+            defaultValue={eventData.participants}
             onChange={handleInputChange}
           />
           {eventId && (
             <View className="mt-[-7px] flex-row items-center opacity-60 gap-1">
               <MaterialIcons name="error-outline" size={17} />
               <Text>
-                Currently {eventData.occupiedSpots} people have subscribed
+                Currently, {subscribedNumber} people have subscribed
               </Text>
             </View>
           )}
-          <TouchableOpacity activeOpacity={0.7} className="bg-pink-200 rounded-full py-3 px-6 self-center flex-row gap-2 items-center">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            className="bg-pink-200 rounded-full py-3 px-6 self-center flex-row gap-2 items-center"
+            onPress={handleSubmit}
+          >
             <MaterialIcons name="save" size={20} color="#C2185B" />
             <Text className="text-pink-600 text-xl">Save event</Text>
           </TouchableOpacity>
@@ -120,7 +130,7 @@ export default function EventForm() {
           <DatePickerModal
             locale="en-GB"
             mode="single"
-            date={eventData.date ?? new Date()}
+            date={eventData.date == undefined ? Date.now() : eventData.date}
             {...datePickerProps}
           />
           <TimePickerModal

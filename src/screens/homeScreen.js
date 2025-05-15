@@ -1,16 +1,17 @@
 import { FlatList, ScrollView, View } from "react-native";
 import Text from "../components/text";
 import { categories } from "../data/categories";
-import { eventSampleList } from "../data/eventSampleList";
 import CategoryItemHorizontal from "../components/categoryItemHorizontal";
 import EventItemHorizontal from "../components/eventItemHorizontal";
 import useAppNavigation from "../hooks/useAppNavigation";
+import { useContext } from "react";
+import { AppContext } from "../../context/AppProvider";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToSearch } = useAppNavigation();
+  const { events } = useContext(AppContext);
 
   const CATEGORIES = categories;
-  const EVENTS = eventSampleList;
 
   return (
     <ScrollView
@@ -49,13 +50,13 @@ export default function HomeScreen() {
             />
             <Text className="text-lg font-semibold">Most popular</Text>
             <FlatList
-              data={EVENTS}
+              data={events}
               horizontal={true}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item._id}
               renderItem={({ item }) => (
                 <EventItemHorizontal
                   item={item}
-                  onPress={() => navigateToEventEdit(item.id)}
+                  onPress={() => navigateToEventEdit(item._id)}
                 />
               )}
               className="pt-2 pb-5"
