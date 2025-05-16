@@ -1,11 +1,6 @@
 import { FlatList, TextInput, TouchableOpacity, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
-import {
-  categories,
-  getCategoryTypeFromValue,
-  getCategoryValueFromLabel,
-} from "../data/categories";
 import EventItem from "../components/eventItem";
 import Text from "../components/text";
 import { useEffect, useRef, useState, memo, useContext } from "react";
@@ -64,12 +59,11 @@ function CategoryFlatList({
 
 export default function SearchScreen() {
   const route = useRoute();
-  const { events, refreshEvents, getEventsByType } = useContext(AppContext);
+  const { events, refreshEvents, getEventsByType, categories, getCategoryTypeFromValue, getCategoryValueFromLabel } = useContext(AppContext);
   const [eventsShown, setEventsShown] = useState([]);
   const { category } = route.params?.category ?? categories[0].label;
   const [selectedCategory, setSelectedCategory] = useState(category);
   const { navigateToEventEdit } = useAppNavigation();
-  const CATEGORIES = categories;
   const flatListRef = useRef(null);
 
   const scrollToItem = (index) => {
@@ -127,7 +121,7 @@ export default function SearchScreen() {
             scrollToItem(getCategoryValueFromLabel(category));
             setSelectedCategory(category);
           }}
-          data={CATEGORIES}
+          data={categories}
           ref={flatListRef}
         />
       </View>

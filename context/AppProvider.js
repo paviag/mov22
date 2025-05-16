@@ -1,17 +1,25 @@
 import React, { useEffect, useState, createContext } from "react";
 import eventService from "../services/eventService";
+import categoryService from "../services/categoryService";
 
 // Create the context
 export const AppContext = createContext({
-  events: [],
   loading: false,
   error: null,
+  // events
+  events: [],
   refreshEvents: () => {},
   getOneEvent: async (id) => {},
   createEvent: async data => {},
   updateEvent: async (data) => {},
   deleteEvent: async id => {},
   getEventsByType: async type => {},
+  // category
+  categories: [],
+  refreshCategories: () => {},
+  createCategory: async data => {},
+  updateCategory: async (data) => {},
+  deleteCategory: async id => {},
 });
 
 // Provider component
@@ -19,6 +27,7 @@ export const AppProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([])
 
   // Initial fetch
   const fetchEvents = async () => {
@@ -33,9 +42,27 @@ export const AppProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  
+  // Initial fetch
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const data = await categoryService.getAllCategories();
+      data.forEach((cat, index) => {
+        cat.value = index
+      })
+      setEvents(data);
+    } catch (err) {
+      setError("Failed to fetch categories.");
+      console.error("Failed to fetch categories:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchEvents();
+    fetchCategories();
   }, []);
 
   // Get one event
@@ -52,7 +79,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Get one event
+  // Get events by type
   const getEventsByType = async (type) => {
     setLoading(true);
     try {
@@ -81,6 +108,21 @@ export const AppProvider = ({ children }) => {
     return null;
   };
 
+  // Create a new category
+  const createCategory = async data => {
+    setLoading(true);
+    try {
+      await categoryService.createCategory(data);
+      await fetchCategories();
+    } catch (err) {
+      setError("Failed to create category.");
+      console.error("Create category failed:", err);
+    } finally {
+      setLoading(false);
+    }
+    return null;
+  };
+
   // Update an existing event
   const updateEvent = async event => {
     setLoading(true);
@@ -90,6 +132,21 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       setError("Failed to update event.");
       console.error("Update event failed:", err);
+    } finally {
+      setLoading(false);
+    }
+    return false;
+  };
+
+  // Update an existing category
+  const updateCategory = async category => {
+    setLoading(true);
+    try {
+      await categoryService.updateCategory(category);
+      await fetchCategories();
+    } catch (err) {
+      setError("Failed to update category.");
+      console.error("Update category failed:", err);
     } finally {
       setLoading(false);
     }
@@ -113,6 +170,31 @@ export const AppProvider = ({ children }) => {
     return false;
   };
 
+  // Delete a category by id
+  const deleteCategory = async id => {
+    setLoading(true);
+    try {
+      const success = await categoryService.deleteCategory(id);
+      if (success) {
+        await fetchCategories();
+        return true;
+      }
+    } catch (err) {
+      console.error("Delete category failed:", err);
+    } finally {
+      setLoading(false);
+    }
+    return false;
+  };
+
+  const getCategoryTypeFromValue = (value) => {
+    return categories.find((c) => c.value === value)?.type || "Unbound";
+  };
+  
+  const getCategoryValueFromLabel = (label) => {
+    return categories.find((c) => c.label === label)?.value || -1;
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -124,7 +206,14 @@ export const AppProvider = ({ children }) => {
         createEvent,
         updateEvent,
         deleteEvent,
-        getEventsByType
+        getEventsByType,
+        categories,
+        refreshCategories: fetchCategories,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+        getCategoryTypeFromValue,
+        getCategoryValueFromLabel
       }}
     >
       {children}

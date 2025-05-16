@@ -12,7 +12,7 @@ const AppNavigator = () => (
     screenOptions={{ headerShown: false }}
     >
     <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Add Event" component={EventForm} />
+    <Tab.Screen name="Add New" component={EventForm} />
     <Tab.Screen name="Search" component={SearchScreen} />
   </Tab.Navigator>
 );

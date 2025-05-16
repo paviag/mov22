@@ -1,12 +1,11 @@
 import { useState, useCallback, useEffect, useContext } from "react";
 import useDropdown from "./useDropdown";
-import { categories, getCategoryTypeFromValue } from "../data/categories";
 import { AppContext } from "../../context/AppProvider";
 import dateParser from "../utils/dateParser";
 import dateFormatter from "../utils/dateFormatter";
 
 const useEventForm = (eventId) => {
-  const { createEvent, updateEvent } = useContext(AppContext);
+  const { createEvent, updateEvent, getCategoryTypeFromValue, categories } = useContext(AppContext);
   const { getOneEvent } = useContext(AppContext);
   const [eventData, setEventData] = useState({
     title: "",

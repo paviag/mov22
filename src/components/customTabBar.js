@@ -3,7 +3,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const iconsMap = {
   Home: "dashboard",
-  "Add Event": "add-circle",
+  "Add New": "add-circle",
   Search: "explore",
   Edit: "design-services",
   Feedback: "reviews",
@@ -24,7 +24,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
           >
             <MaterialIcons
               name={iconsMap[route.name]}
-              size={route.name == 'Add Event' ? 60 : 40}
+              size={route.name == 'Add New' ? 60 : 40}
               color="white"
               className={isFocused ? "" : "opacity-70"}
             />

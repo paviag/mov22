@@ -13,11 +13,8 @@ import {
 import useEventForm from "../hooks/useEventForm";
 import InputComponent from "../components/inputComponent";
 import BaseInputComponent from "../components/baseInputComponent";
-import { useContext } from "react";
-import { AppContext } from "../../context/AppProvider";
 registerTranslation("en-GB", enGB);
 
-// id, name, location, date, description, image, available spots, taken spots, image?
 export default function EventForm() {
   const route = useRoute();
   const { eventId } = route.params || {};
@@ -32,9 +29,7 @@ export default function EventForm() {
     subscribedNumber,
     handleSubmit
   } = useEventForm(eventId);
-  console.log("down in event form")
-  console.log(eventData.date)
-  console.log(eventData.date?.toLocaleDateString())
+  
   return (
     <ScrollView
       className="bg-white"

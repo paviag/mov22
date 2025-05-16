@@ -1,6 +1,5 @@
 import { FlatList, ScrollView, View } from "react-native";
 import Text from "../components/text";
-import { categories } from "../data/categories";
 import CategoryItemHorizontal from "../components/categoryItemHorizontal";
 import EventItemHorizontal from "../components/eventItemHorizontal";
 import useAppNavigation from "../hooks/useAppNavigation";
@@ -9,9 +8,7 @@ import { AppContext } from "../../context/AppProvider";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToSearch } = useAppNavigation();
-  const { events } = useContext(AppContext);
-
-  const CATEGORIES = categories;
+  const { events, categories } = useContext(AppContext);
 
   return (
     <ScrollView
@@ -36,7 +33,7 @@ export default function HomeScreen() {
           <View className="bg-white rounded-tl-[55px] p-10 pb-40">
             <Text className="text-lg font-semibold">Explore categories</Text>
             <FlatList
-              data={CATEGORIES}
+              data={categories}
               horizontal={true}
               keyExtractor={(item) => item.value}
               renderItem={({ item }) => (
