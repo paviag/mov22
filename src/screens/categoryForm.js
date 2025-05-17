@@ -14,7 +14,7 @@ export default function CategoryForm() {
     iconDropdownProps,
     handleInputChange,
     handleSubmit
-  } = useCategoryForm() // TODO: this doesnt exist yet estoy en la rama correcta ola?
+  } = useCategoryForm() // TODO: this doesnt exist yet 
   
   return (
     <ScrollView
