@@ -18,6 +18,7 @@ registerTranslation("en-GB", enGB);
 export default function EventForm() {
   const route = useRoute();
   const { eventId } = route.params || {};
+
   const {
     eventData,
     categoryDropdownProps,
