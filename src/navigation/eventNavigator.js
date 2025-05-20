@@ -1,7 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import EventForm from "../screens/eventForm";
+import FeedbackDashboard from "../screens/feedbackDashboard";
 import { useRoute } from "@react-navigation/native";
 import CustomTabBar from "../components/customTabBar";
+
 
 const EventTab = createBottomTabNavigator();
 
@@ -15,7 +17,7 @@ const EventNavigator = () => {
       screenOptions={{ headerShown: false }}
       >
       <EventTab.Screen name="Edit" component={EventForm} initialParams={{ eventId }} />
-      <EventTab.Screen name="Feedback" component={EventForm} initialParams={{ eventId }} />
+      <EventTab.Screen name="Feedback" component={FeedbackDashboard} initialParams={{ eventId }} />
     </EventTab.Navigator>
   );
 }
