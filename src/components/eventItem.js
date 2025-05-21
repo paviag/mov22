@@ -6,7 +6,7 @@ export default function EventItem({ item, handleDelete, navigateEdit }) {
 
   return (
     <View className="rounded-3xl bg-white px-5 py-6 w-full flex-row justify-between items-center">
-      <View className="w-[21rem]">
+      <View className="w-[90%]">
         <Text
           className="text-xl font-strong text-ellipsis overflow-hidden"
           numberOfLines={1}

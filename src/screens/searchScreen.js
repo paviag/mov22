@@ -6,6 +6,8 @@ import { useEffect, useRef, useState, memo, useContext } from "react";
 import useAppNavigation from "../hooks/useAppNavigation";
 import { AppContext } from "../../context/AppProvider";
 import LoadingScreen from "./loadingScreen";
+import { Alert } from "react-native";
+
 
 const CategoryItem = memo(({ item, selectedCategory, setSelectedCategory }) => (
   <TouchableOpacity
@@ -84,9 +86,45 @@ export default function SearchScreen() {
     }
   };
 
-  const handleDelete = () => {
-    
-  };
+ const handleDelete = (eventId) => {
+  Alert.alert(
+    "Delete Event",
+    "Are you sure you want to delete this event?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+        color: "pink",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+         color: "pink",
+        onPress: async () => {
+          try {
+            await deleteEvent(eventId);
+
+            if (selectedCategory === "All") {
+              refreshEvents();
+              setEventsShown((prevEvents) =>
+                prevEvents.filter((e) => e._id !== eventId)
+              );
+            } else {
+              const catValue = getCategoryValueFromLabel(selectedCategory);
+              const type = getCategoryTypeFromValue(catValue);
+              const newEventsShown = await getEventsByType(type);
+              setEventsShown(newEventsShown);
+            }
+          } catch (error) {
+            Alert.alert("Error", "This event could not be deleted.");
+          }
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+};
+
 
   useEffect(() => {
     setSelectedCategory("All");
