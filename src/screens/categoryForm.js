@@ -7,12 +7,14 @@ import InputComponent from "../components/inputComponent";
 import useCategoryForm from "../hooks/useCategoryForm";
 import LoadingScreen from "./loadingScreen";
 import categoryService from "../../services/categoryService";
-
+import { useContext } from "react";
+import { AppContext } from "../../context/AppProvider";
 
 export default function CategoryForm() {
   const route = useRoute();
   const navigation = useNavigation();
   const { categoryId } = route.params || {};
+  const { deleteCategory, refreshCategories } = useContext(AppContext);
   const {
     categoryData,
     handleInputChange,
@@ -46,13 +48,14 @@ export default function CategoryForm() {
             style: 'destructive',
             onPress: async () => {
               try {
-                console.log("Attempting to delete category with ID:", categoryData._id);
-                await categoryService.deleteCategory(categoryData._id);
+                await deleteCategory(categoryData._id);
                 
                 Alert.alert('Success', 'Category deleted successfully', [
                   { 
                     text: 'OK', 
-                    onPress: () => navigation.goBack() 
+                    onPress: () => {
+                      navigation.goBack();
+                    }
                   }
                 ]);
               } catch (error) {
@@ -73,8 +76,6 @@ export default function CategoryForm() {
       Alert.alert('Error', 'There was a problem showing the delete confirmation.');
     }
   };
-
-  console.log("Current category data:", categoryData);
 
   return (
     <ScrollView
@@ -101,7 +102,6 @@ export default function CategoryForm() {
         </View>
         <View className="pl-5 pr-6 pt-7">
           <View className="flex-row justify-center gap-4">
-            {/* Botón Guardar */}
             <TouchableOpacity
               activeOpacity={0.7}
               className="bg-pink-200 rounded-full py-3 px-6 flex-row items-center"
