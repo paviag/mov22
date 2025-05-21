@@ -19,7 +19,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
         return (
           <TouchableOpacity
             key={route.name}
-            onPress={() => navigation.navigate(route.name)}
+            onPress={() => navigation.navigate(route.name, route.options ?? {})}
             accessibilityLabel={`Navigate to ${route.name}`}
           >
             <MaterialIcons

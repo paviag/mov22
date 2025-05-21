@@ -1,4 +1,4 @@
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { TouchableOpacity, View, Alert } from "react-native";
 import Text from "../components/text";
 import { ScrollView } from "react-native";
@@ -6,76 +6,33 @@ import { MaterialIcons } from "@expo/vector-icons";
 import InputComponent from "../components/inputComponent";
 import useCategoryForm from "../hooks/useCategoryForm";
 import LoadingScreen from "./loadingScreen";
-import categoryService from "../../services/categoryService";
-import { useContext } from "react";
-import { AppContext } from "../../context/AppProvider";
 
-export default function CategoryForm() {
+export default function CategoryForm({ navigation }) {
   const route = useRoute();
-  const navigation = useNavigation();
   const { categoryId } = route.params || {};
-  const { deleteCategory, refreshCategories } = useContext(AppContext);
   const {
     categoryData,
     handleInputChange,
     handleSubmit,
+    handleDelete,
     loading,
     error, 
     setError,
-  } = useCategoryForm(categoryId);
+  } = useCategoryForm(categoryId, navigation);
 
   if (loading) {
     return <LoadingScreen />;
   }
 
-  const handleDelete = async () => {
-    if (!categoryData || !categoryData._id) {
-      Alert.alert('Error', 'Cannot delete: Category ID is missing');
-      return;
-    }
-
-    try {
-      Alert.alert(
-        'Delete Category',
-        'Are you sure you want to delete this category?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                await deleteCategory(categoryData._id);
-                
-                Alert.alert('Success', 'Category deleted successfully', [
-                  { 
-                    text: 'OK', 
-                    onPress: () => {
-                      navigation.goBack();
-                    }
-                  }
-                ]);
-              } catch (error) {
-                console.error("Delete operation failed:", error);
-                let errorMessage = 'There was a problem deleting the category.';
-                
-                if (error.response && error.response.data && error.response.data.message) {
-                  errorMessage = error.response.data.message;
-                }
-                
-                Alert.alert('Error', errorMessage);
-              }
-            },
-          },
-        ]
-      );
-    } catch (error) {
-      Alert.alert('Error', 'There was a problem showing the delete confirmation.');
-    }
-  };
+  if (error) {
+    Alert.alert(
+      'Error', error, [
+        {
+          text: 'OK',
+          onPress: () => setError(undefined),
+        }
+      ]);
+  }
 
   return (
     <ScrollView
@@ -94,7 +51,7 @@ export default function CategoryForm() {
               name="label"
               icon="view-headline"
               color="white"
-              defaultValue={categoryData.label}
+              defaultValue={categoryData?.label}
               transparent={true}
               onChange={handleInputChange}
             />

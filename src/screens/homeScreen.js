@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, View } from "react-native";
+import { Alert, FlatList, ScrollView, View } from "react-native";
 import Text from "../components/text";
 import CategoryItemHorizontal from "../components/categoryItemHorizontal";
 import EventItemHorizontal from "../components/eventItemHorizontal";
@@ -9,10 +9,20 @@ import LoadingScreen from "./loadingScreen";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToCategoryEdit } = useAppNavigation();
-  const { events, categories, loading, error, setError } = useContext(AppContext);
+  const { events, categories, loading, error, setError } =
+    useContext(AppContext);
 
   if (loading) {
     return <LoadingScreen />;
+  }
+
+  if (error) {
+    Alert.alert("Error", error, [
+      {
+        text: "OK",
+        onPress: () => setError(undefined),
+      },
+    ]);
   }
 
   return (
@@ -44,7 +54,11 @@ export default function HomeScreen() {
               renderItem={({ item }) => (
                 <CategoryItemHorizontal
                   item={item}
-                  onPress={() => navigateToCategoryEdit(item._id)}
+                  onPress={() => {
+                    if (item.label != "All") {
+                      navigateToCategoryEdit(item._id);
+                    }
+                  }}
                 />
               )}
               className="pt-2 pb-5"

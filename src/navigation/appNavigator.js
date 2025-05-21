@@ -12,7 +12,7 @@ const AppNavigator = () => (
     screenOptions={{ headerShown: false }}
     >
     <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Add New" component={AddNavigator} />
+    <Tab.Screen name="Add New" component={AddNavigator} options={{ unmountOnBlur: true }} />
     <Tab.Screen name="Search" component={SearchScreen} />
   </Tab.Navigator>
 );

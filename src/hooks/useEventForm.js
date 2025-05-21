@@ -3,8 +3,10 @@ import useDropdown from "./useDropdown";
 import { AppContext } from "../../context/AppProvider";
 import dateParser from "../utils/dateParser";
 import dateFormatter from "../utils/dateFormatter";
+import handleAction from "../utils/actionHandler";
+import { Alert } from "react-native";
 
-const useEventForm = (eventId) => {
+const useEventForm = (eventId, navigation) => {
   const {
     createEvent,
     updateEvent,
@@ -72,13 +74,29 @@ const useEventForm = (eventId) => {
     [eventData.date]
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (navigation) => {
     if (eventId !== undefined) {
       // update existing event
-      await updateEvent({ ...eventData, date: dateFormatter(eventData.date) });
+      handleAction(
+        "Update Event",
+        "Are you sure you want to overwrite event data?",
+        "Changes saved.",
+        error,
+        async () =>
+          await updateEvent({
+            ...eventData,
+            date: dateFormatter(eventData.date),
+          })
+      );
     } else {
       // create new event
       await createEvent({ ...eventData, date: dateFormatter(eventData.date) });
+      Alert.alert("Success", "Event created successfully.", [
+        {
+          text: "OK",
+          onPress: () => navigation.goBack(),
+        },
+      ]);
     }
   };
 
@@ -88,7 +106,7 @@ const useEventForm = (eventId) => {
         try {
           const fetchedData = await getOneEvent(eventId);
           const newDate = dateParser(fetchedData.date);
-          setEventData({...fetchedData, "date": newDate});
+          setEventData({ ...fetchedData, date: newDate });
           setSubscribedNumber(
             fetchedData.participants - fetchedData.availableSpots
           );

@@ -39,6 +39,15 @@ export default function EventForm() {
     return <LoadingScreen />;
   }
 
+  if (error) {
+    Alert.alert("Error", error, [
+      {
+        text: "OK",
+        onPress: () => setError(undefined),
+      },
+    ]);
+  }
+
   return (
     <ScrollView
       className="bg-white"
@@ -118,9 +127,7 @@ export default function EventForm() {
           {eventId && (
             <View className="mt-[-7px] flex-row items-center opacity-60 gap-1">
               <MaterialIcons name="error-outline" size={17} />
-              <Text>
-                Currently, {subscribedNumber} people have subscribed
-              </Text>
+              <Text>Currently, {subscribedNumber} people have subscribed</Text>
             </View>
           )}
           <TouchableOpacity
