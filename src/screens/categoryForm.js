@@ -1,14 +1,17 @@
-import { useRoute } from "@react-navigation/native";
-import { TouchableOpacity, View } from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { TouchableOpacity, View, Alert } from "react-native";
 import Text from "../components/text";
 import { ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import InputComponent from "../components/inputComponent";
 import useCategoryForm from "../hooks/useCategoryForm";
 import LoadingScreen from "./loadingScreen";
+import categoryService from "../../services/categoryService";
+
 
 export default function CategoryForm() {
   const route = useRoute();
+  const navigation = useNavigation();
   const { categoryId } = route.params || {};
   const {
     categoryData,
@@ -22,6 +25,56 @@ export default function CategoryForm() {
   if (loading) {
     return <LoadingScreen />;
   }
+
+  const handleDelete = async () => {
+    if (!categoryData || !categoryData._id) {
+      Alert.alert('Error', 'Cannot delete: Category ID is missing');
+      return;
+    }
+
+    try {
+      Alert.alert(
+        'Delete Category',
+        'Are you sure you want to delete this category?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                console.log("Attempting to delete category with ID:", categoryData._id);
+                await categoryService.deleteCategory(categoryData._id);
+                
+                Alert.alert('Success', 'Category deleted successfully', [
+                  { 
+                    text: 'OK', 
+                    onPress: () => navigation.goBack() 
+                  }
+                ]);
+              } catch (error) {
+                console.error("Delete operation failed:", error);
+                let errorMessage = 'There was a problem deleting the category.';
+                
+                if (error.response && error.response.data && error.response.data.message) {
+                  errorMessage = error.response.data.message;
+                }
+                
+                Alert.alert('Error', errorMessage);
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'There was a problem showing the delete confirmation.');
+    }
+  };
+
+  console.log("Current category data:", categoryData);
 
   return (
     <ScrollView
@@ -46,15 +99,30 @@ export default function CategoryForm() {
             />
           </View>
         </View>
-        <View className="pl-5 pr-6 pt-7 gap-4">
-          <TouchableOpacity
-            activeOpacity={0.7}
-            className="bg-pink-200 rounded-full py-3 px-6 self-center flex-row gap-2 items-center"
-            onPress={handleSubmit}
-          >
-            <MaterialIcons name="save" size={20} color="#C2185B" />
-            <Text className="text-pink-600 text-xl">Save category</Text>
-          </TouchableOpacity>
+        <View className="pl-5 pr-6 pt-7">
+          <View className="flex-row justify-center gap-4">
+            {/* Botón Guardar */}
+            <TouchableOpacity
+              activeOpacity={0.7}
+              className="bg-pink-200 rounded-full py-3 px-6 flex-row items-center"
+              onPress={handleSubmit}
+            >
+              <MaterialIcons name="save" size={20} color="#C2185B" />
+              <Text className="text-pink-600 text-xl ml-2">Save category</Text>
+            </TouchableOpacity>
+
+            {/*solo mostrar para categorías existentes */}
+            {categoryData && categoryData._id && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="bg-red-100 rounded-full py-3 px-6 flex-row items-center"
+                onPress={handleDelete}
+              >
+                <MaterialIcons name="delete" size={20} color="#C2185B" />
+                <Text className="text-pink-600 text-xl ml-2">Delete</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
     </ScrollView>
