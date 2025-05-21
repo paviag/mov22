@@ -5,13 +5,21 @@ import dateParser from "../utils/dateParser";
 import dateFormatter from "../utils/dateFormatter";
 
 const useEventForm = (eventId) => {
-  const { createEvent, updateEvent, getCategoryTypeFromValue, categories } = useContext(AppContext);
-  const { getOneEvent } = useContext(AppContext);
+  const {
+    createEvent,
+    updateEvent,
+    getCategoryTypeFromValue,
+    categories,
+    getOneEvent,
+    loading,
+    error,
+    setError,
+  } = useContext(AppContext);
   const [eventData, setEventData] = useState({
     title: "",
     type: "",
     location: "",
-    date: new Date(),
+    date: new Date(new Date().setSeconds(0, 0)),
     details: "",
     participants: 0,
     availableSpots: 0,
@@ -64,27 +72,23 @@ const useEventForm = (eventId) => {
     [eventData.date]
   );
 
-  const handleSubmit = async (eventId) => {
-    // parse event date to
-    if (eventId) {
+  const handleSubmit = async () => {
+    if (eventId !== undefined) {
       // update existing event
-      await updateEvent({...eventData, date: dateFormatter(eventData.date)});
+      await updateEvent({ ...eventData, date: dateFormatter(eventData.date) });
     } else {
       // create new event
-      await createEvent({...eventData, date: dateFormatter(eventData.date)});
+      await createEvent({ ...eventData, date: dateFormatter(eventData.date) });
     }
   };
 
   useEffect(() => {
     const fetchEventData = async () => {
-      if (eventId) {
+      if (eventId !== undefined) {
         try {
           const fetchedData = await getOneEvent(eventId);
-          console.log(fetchedData.date)
-          console.log(dateParser(fetchedData.date))
-          console.log("fetched and parsed above")
-          fetchedData.date = dateParser(fetchedData.date);
-          setEventData(fetchedData);
+          const newDate = dateParser(fetchedData.date);
+          setEventData({...fetchedData, "date": newDate});
           setSubscribedNumber(
             fetchedData.participants - fetchedData.availableSpots
           );
@@ -92,7 +96,7 @@ const useEventForm = (eventId) => {
             categories.find((e) => e.label === fetchedData.type)?.value
           );
         } catch (error) {
-          console.error("Error fetching event data:", error);
+          console.log("Error fetching event data:", error.message);
         }
       }
     };
@@ -122,7 +126,10 @@ const useEventForm = (eventId) => {
     setOpenDatePicker,
     setOpenTimePicker,
     handleInputChange,
-    handleSubmit
+    handleSubmit,
+    loading,
+    error,
+    setError,
   };
 };
 

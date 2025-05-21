@@ -4,18 +4,25 @@ import Text from "../components/text";
 import { ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import InputComponent from "../components/inputComponent";
-import BaseInputComponent from "../components/baseInputComponent";
+import useCategoryForm from "../hooks/useCategoryForm";
+import LoadingScreen from "./loadingScreen";
 
 export default function CategoryForm() {
   const route = useRoute();
   const { categoryId } = route.params || {};
   const {
     categoryData,
-    iconDropdownProps,
     handleInputChange,
-    handleSubmit
-  } = useCategoryForm() // TODO: this doesnt exist yet 
-  
+    handleSubmit,
+    loading,
+    error, 
+    setError,
+  } = useCategoryForm(categoryId);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ScrollView
       className="bg-white"
@@ -40,28 +47,13 @@ export default function CategoryForm() {
           </View>
         </View>
         <View className="pl-5 pr-6 pt-7 gap-4">
-          <BaseInputComponent name="iconName" icon="icon">
-            <DropDownPicker
-              {...iconDropdownProps}
-              listMode="SCROLLVIEW"
-              autoScroll={true}
-              dropDownContainerStyle={{
-                backgroundColor: "#f3f4f6",
-                borderWidth: 0,
-              }}
-              disabledStyle={{ borderWidth: 4 }}
-              style={{ backgroundColor: "#f3f4f6", borderWidth: 0 }}
-              textStyle={{ fontFamily: "Nunito_400Regular", fontSize: 16 }}
-            />
-          </BaseInputComponent> 
-          <MaterialIcons name={categoryData.iconName} size={20} color="#C2185B" />
           <TouchableOpacity
             activeOpacity={0.7}
             className="bg-pink-200 rounded-full py-3 px-6 self-center flex-row gap-2 items-center"
             onPress={handleSubmit}
           >
             <MaterialIcons name="save" size={20} color="#C2185B" />
-            <Text className="text-pink-600 text-xl">Save event</Text>
+            <Text className="text-pink-600 text-xl">Save category</Text>
           </TouchableOpacity>
         </View>
       </View>

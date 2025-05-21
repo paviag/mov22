@@ -10,6 +10,7 @@ export default function InputComponent({
     longText = false,
     onChange,
     disabled = false,
+    keyboardType = "default",
     onPress = () => {},
     color = "black"
   }) {
@@ -30,7 +31,7 @@ export default function InputComponent({
           defaultValue={defaultValue?.toString()}
           returnKeyType="next"
           accessibilityLabel={`Event ${name} input field`}
-          keyboardType={typeof defaultValue == "number" ? "numeric" : "default"}
+          keyboardType={keyboardType}
           style={{ fontFamily: "Nunito_400Regular" }}
           multiline={longText}
           numberOfLines={4}

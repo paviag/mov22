@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 class CategoryService {
-  constructor(baseURL = 'http://localhost:3000') {
+  constructor(baseURL = "https://api-puntog-nfmr.onrender.com") {
     this.api = axios.create({
       baseURL: baseURL,
       timeout: 10000,
@@ -23,7 +23,24 @@ class CategoryService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.log('Error fetching categories:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get one categry from the API from its id
+   * @returns {Promise<Object>} Promise that resolves to a category
+   */
+  async getCategory(id) {
+    try {
+      const response = await this.api.get(`/categories/${id}`);
+      if (response.status !== 200) {
+        throw new Error(`Failed to get category: ${response.data.error}`);
+      }
+      return response.data;
+    } catch (error) {
+      console.log('Error getting category:', error.message);
       throw error;
     }
   }
@@ -38,8 +55,8 @@ class CategoryService {
       const response = await this.api.post('/categories', data);
       return response.status === 200;
     } catch (error) {
-      console.error('Error creating categories:', error);
-      return false;
+      console.log('Error creating categories:', error.message);
+      throw error;
     }
   }
     
@@ -57,7 +74,7 @@ class CategoryService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.log('Error updating category:', error.message);
       throw error;
     }
   }
@@ -75,7 +92,7 @@ class CategoryService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.log('Error deleting category:', error.message);
       throw error;
     }
   }

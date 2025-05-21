@@ -1,11 +1,11 @@
 import { FlatList, TextInput, TouchableOpacity, View } from "react-native";
-import { useRoute } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import EventItem from "../components/eventItem";
 import Text from "../components/text";
 import { useEffect, useRef, useState, memo, useContext } from "react";
 import useAppNavigation from "../hooks/useAppNavigation";
 import { AppContext } from "../../context/AppProvider";
+import LoadingScreen from "./loadingScreen";
 
 const CategoryItem = memo(({ item, selectedCategory, setSelectedCategory }) => (
   <TouchableOpacity
@@ -58,11 +58,18 @@ function CategoryFlatList({
 }
 
 export default function SearchScreen() {
-  const route = useRoute();
-  const { events, refreshEvents, getEventsByType, categories, getCategoryTypeFromValue, getCategoryValueFromLabel } = useContext(AppContext);
+  const {
+    events,
+    refreshEvents,
+    getEventsByType,
+    categories,
+    getCategoryTypeFromValue,
+    getCategoryValueFromLabel,
+    deleteEvent,
+    loading,
+  } = useContext(AppContext);
   const [eventsShown, setEventsShown] = useState([]);
-  const { category } = route.params?.category ?? categories[0].label;
-  const [selectedCategory, setSelectedCategory] = useState(category);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const { navigateToEventEdit } = useAppNavigation();
   const flatListRef = useRef(null);
 
@@ -77,15 +84,13 @@ export default function SearchScreen() {
     }
   };
 
-  const handleDelete = () => {};
+  const handleDelete = () => {
+    
+  };
 
   useEffect(() => {
-    if (route.params) {
-      setSelectedCategory(route.params.category);
-    } else {
-      setSelectedCategory("All");
-    }
-  }, [route.params]);
+    setSelectedCategory("All");
+  }, []);
 
   useEffect(() => {
     const updateEventsShown = async () => {
@@ -125,7 +130,9 @@ export default function SearchScreen() {
           ref={flatListRef}
         />
       </View>
-      {eventsShown.length == 0 ? (
+      {loading ? (
+        <LoadingScreen />
+      ) : eventsShown.length === 0 ? (
         <View className="items-center pt-48 gap-4">
           <View className="bg-pink-200 p-6 rounded-full">
             <MaterialIcons name="calendar-today" size={60} color="#C2185B" />

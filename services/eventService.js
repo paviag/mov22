@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 class EventService {
-  constructor(baseURL = 'http://localhost:3000') {
+  constructor(baseURL = "https://api-puntog-nfmr.onrender.com") {
     this.api = axios.create({
       baseURL: baseURL,
       timeout: 10000,
@@ -23,7 +23,7 @@ class EventService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.log('Error fetching events:', error.message);
       throw error;
     }
   }
@@ -40,7 +40,7 @@ class EventService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error getting event:', error);
+      console.log('Error getting event:', error.message);
       throw error;
     }
   }
@@ -54,7 +54,7 @@ class EventService {
       const response = await this.api.get('/events/version');
       return response.data;
     } catch (error) {
-      console.error('Error fetching events version:', error);
+      console.log('Error fetching events version:', error.message);
       throw error;
     }
   }
@@ -72,7 +72,7 @@ class EventService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error filtering events by type:', error);
+      console.log('Error filtering events by type:', error.message);
       throw error;
     }
   }
@@ -87,8 +87,8 @@ class EventService {
       const response = await this.api.post('/events', data);
       return response.status === 200;
     } catch (error) {
-      console.error('Error creating event:', error);
-      return false;
+      console.log('Error creating event:', error.message);
+      throw error;
     }
   }
     
@@ -106,7 +106,7 @@ class EventService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error updating event:', error);
+      console.log('Error updating event:', error.message);
       throw error;
     }
   }
@@ -124,7 +124,7 @@ class EventService {
       }
       return response.data;
     } catch (error) {
-      console.error('Error deleting event:', error);
+      console.log('Error deleting event:', error.message);
       throw error;
     }
   }

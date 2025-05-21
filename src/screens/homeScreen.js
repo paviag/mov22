@@ -5,10 +5,15 @@ import EventItemHorizontal from "../components/eventItemHorizontal";
 import useAppNavigation from "../hooks/useAppNavigation";
 import { useContext } from "react";
 import { AppContext } from "../../context/AppProvider";
+import LoadingScreen from "./loadingScreen";
 
 export default function HomeScreen() {
-  const { navigateToEventEdit, navigateToSearch } = useAppNavigation();
-  const { events, categories } = useContext(AppContext);
+  const { navigateToEventEdit, navigateToCategoryEdit } = useAppNavigation();
+  const { events, categories, loading, error, setError } = useContext(AppContext);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <ScrollView
@@ -39,7 +44,7 @@ export default function HomeScreen() {
               renderItem={({ item }) => (
                 <CategoryItemHorizontal
                   item={item}
-                  onPress={() => navigateToSearch(item.label)}
+                  onPress={() => navigateToCategoryEdit(item._id)}
                 />
               )}
               className="pt-2 pb-5"

@@ -13,6 +13,7 @@ import {
 import useEventForm from "../hooks/useEventForm";
 import InputComponent from "../components/inputComponent";
 import BaseInputComponent from "../components/baseInputComponent";
+import LoadingScreen from "./loadingScreen";
 registerTranslation("en-GB", enGB);
 
 export default function EventForm() {
@@ -28,9 +29,16 @@ export default function EventForm() {
     setOpenTimePicker,
     handleInputChange,
     subscribedNumber,
-    handleSubmit
+    handleSubmit,
+    loading,
+    error,
+    setError,
   } = useEventForm(eventId);
-  
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <ScrollView
       className="bg-white"
@@ -105,6 +113,7 @@ export default function EventForm() {
             icon="loyalty"
             defaultValue={eventData.participants}
             onChange={handleInputChange}
+            keyboardType="numeric"
           />
           {eventId && (
             <View className="mt-[-7px] flex-row items-center opacity-60 gap-1">

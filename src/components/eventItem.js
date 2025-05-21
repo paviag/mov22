@@ -1,12 +1,11 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { View, TouchableOpacity } from "react-native";
 import Text from "./text";
-import dateFormatter from "../utils/dateFormatter";
 
 export default function EventItem({ item, handleDelete, navigateEdit }) {
 
   return (
-    <View className="rounded-3xl bg-white px-5 py-6 w-full">
+    <View className="rounded-3xl bg-white px-5 py-6 w-full flex-row justify-between items-center">
       <View className="w-[21rem]">
         <Text
           className="text-xl font-strong text-ellipsis overflow-hidden"
@@ -15,35 +14,35 @@ export default function EventItem({ item, handleDelete, navigateEdit }) {
           {item.title}
         </Text>
         <View className="flex-row gap-1 items-center">
-          <MaterialIcons title="place" size={22} color="gray" />
+          <MaterialIcons name="place" size={22} color="gray" />
           <Text className="text-ellipsis overflow-hidden text-gray-600" numberOfLines={1}>
             {item.location}
           </Text>
         </View>
         <View className="flex-row gap-1 items-center">
-          <MaterialIcons title="event" size={22} color="gray" />
+          <MaterialIcons name="event" size={22} color="gray" />
           <Text className="text-gray-600">
-            {dateFormatter(item.date)}
+            {item.date}
           </Text>
         </View>
       </View>
 
-      <View className="absolute top-0 right-0 bottom-0 gap-2 py-5 pr-4 justify-around">
+      <View className="gap-2 justify-around">
         <TouchableOpacity
           activeOpacity={0.7}
-          className="bg-pink-200 rounded-full items-center justify-center p-2"
+          className="bg-pink-200 rounded-full items-center w-10 h-10 justify-center"
           onPress={() => handleDelete(item._id)}
           accessibilityLabel="Delete event"
         >
-          <MaterialIcons title="delete-outline" size={20} color="#C2185B" />
+          <MaterialIcons name="delete-outline" size={20} color="#C2185B" />
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
-          className="bg-pink-200 rounded-full items-center justify-center p-2"
+          className="bg-pink-200 rounded-full items-center w-10 h-10 justify-center"
           onPress={() => navigateEdit(item._id)}
           accessibilityLabel="Edit event"
         >
-          <MaterialIcons title="design-services" size={20} color="#C2185B" />
+          <MaterialIcons name="design-services" size={20} color="#C2185B" />
         </TouchableOpacity>
       </View>
     </View>

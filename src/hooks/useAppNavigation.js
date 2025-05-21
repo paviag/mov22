@@ -8,14 +8,18 @@ const useAppNavigation = () => {
   };
 
   const navigateToEventEdit = (eventId) => {
-    navigation.navigate("View Event", { screen: "Edit", eventId });
+    navigation.navigate("View Event", { screen: "Edit", ...(eventId == undefined ? {} : { eventId }) });
+  };
+
+  const navigateToCategoryEdit = (categoryId) => {
+    navigation.navigate("View Category", categoryId == undefined ? {} : { categoryId });
   };
 
   const navigateToSearch = (category) => {
     navigation.navigate("Search", category == undefined ? {} : { category });
   };
 
-  return { navigateToEventFeedback, navigateToEventEdit, navigateToSearch };
+  return { navigateToEventFeedback, navigateToEventEdit, navigateToCategoryEdit };
 };
 
 export default useAppNavigation;
