@@ -31,14 +31,16 @@ const useCategoryForm = (categoryId, navigation) => {
         "Update Category",
         "Are you sure you want to overwrite category data?",
         "Changes saved.",
-        error,
         async () => await updateCategory(categoryData)
       );
     } else {
-      await createCategory({
+      const success = await createCategory({
         ...categoryData,
         type: categoryData.label.toLowerCase().replace(/\s+/g, "_"),
       });
+      if (!success) {
+        return;
+      }
       Alert.alert("Success", "Category created successfully.", [
         {
           text: "OK",
@@ -58,7 +60,6 @@ const useCategoryForm = (categoryId, navigation) => {
       "Delete Category",
       "Are you sure you want to delete this category?",
       "Category deleted successfully.",
-      error,
       async () => await deleteCategory(categoryData._id),
       () => navigation.goBack()
     );

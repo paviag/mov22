@@ -1,5 +1,5 @@
 import { useRoute } from "@react-navigation/native";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, TouchableOpacity, View } from "react-native";
 import Text from "../components/text";
 import { ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -14,9 +14,12 @@ import useEventForm from "../hooks/useEventForm";
 import InputComponent from "../components/inputComponent";
 import BaseInputComponent from "../components/baseInputComponent";
 import LoadingScreen from "./loadingScreen";
+import eventBackgroundsMap from "../utils/eventBackgroundsMap";
+import { Image } from "react-native";
+import { useState } from "react";
 registerTranslation("en-GB", enGB);
 
-export default function EventForm() {
+export default function EventForm({ navigation }) {
   const route = useRoute();
   const { eventId } = route.params || {};
 
@@ -33,7 +36,12 @@ export default function EventForm() {
     loading,
     error,
     setError,
-  } = useEventForm(eventId);
+  } = useEventForm(eventId, navigation);
+  const [loadedImages, setLoadedImages] = useState({});
+
+  const handleImageLoad = (item) => {
+    setLoadedImages((prev) => ({ ...prev, [item]: true }));
+  };
 
   if (loading) {
     return <LoadingScreen />;
@@ -130,6 +138,35 @@ export default function EventForm() {
               <Text>Currently, {subscribedNumber} people have subscribed</Text>
             </View>
           )}
+          <BaseInputComponent name="background image" icon="image">
+            <FlatList
+              data={Object.keys(eventBackgroundsMap)}
+              keyExtractor={(item) => item}
+              numColumns={2}
+              scrollEnabled={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="flex-1"
+                  onPress={() => handleInputChange("path", item)}
+                >
+                  <Image 
+                    source={eventBackgroundsMap[item]} 
+                    className="w-full h-28"
+                    resizeMode="cover"
+                    onLoad={() => handleImageLoad(item)}
+                  />
+                  {!loadedImages[item] && (
+                    <View className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                      <ActivityIndicator size="small" color="#EC4899" />
+                    </View>
+                  )}
+                  {item == eventData.path && <View className="absolute inset-0 bg-pink-400 opacity-70" />}
+                </TouchableOpacity>
+              )}
+              ListFooterComponent={<View className="h-4" />}
+            />
+          </BaseInputComponent>
           <TouchableOpacity
             activeOpacity={0.7}
             className="bg-pink-200 rounded-full py-3 px-6 self-center flex-row gap-2 items-center"

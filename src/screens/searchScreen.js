@@ -7,7 +7,8 @@ import useAppNavigation from "../hooks/useAppNavigation";
 import { AppContext } from "../../context/AppProvider";
 import LoadingScreen from "./loadingScreen";
 import { Alert } from "react-native";
-
+import { useIsFocused } from "@react-navigation/native";
+import handleAction from "../utils/actionHandler";
 
 const CategoryItem = memo(({ item, selectedCategory, setSelectedCategory }) => (
   <TouchableOpacity
@@ -74,6 +75,19 @@ export default function SearchScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const { navigateToEventEdit } = useAppNavigation();
   const flatListRef = useRef(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    console.log("use eff search")
+    const refreshData = async () => {
+      await refreshCategories();
+      await refreshEvents();
+    };
+    if (isFocused) {
+      refreshData();
+      setEventsShown(events);
+    }
+  }, [isFocused]);
 
   const scrollToItem = (index) => {
     try {
@@ -86,45 +100,15 @@ export default function SearchScreen() {
     }
   };
 
- const handleDelete = (eventId) => {
-  Alert.alert(
-    "Delete Event",
-    "Are you sure you want to delete this event?",
-    [
-      {
-        text: "Cancel",
-        style: "cancel",
-        color: "pink",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-         color: "pink",
-        onPress: async () => {
-          try {
-            await deleteEvent(eventId);
-
-            if (selectedCategory === "All") {
-              refreshEvents();
-              setEventsShown((prevEvents) =>
-                prevEvents.filter((e) => e._id !== eventId)
-              );
-            } else {
-              const catValue = getCategoryValueFromLabel(selectedCategory);
-              const type = getCategoryTypeFromValue(catValue);
-              const newEventsShown = await getEventsByType(type);
-              setEventsShown(newEventsShown);
-            }
-          } catch (error) {
-            Alert.alert("Error", "This event could not be deleted.");
-          }
-        },
-      },
-    ],
-    { cancelable: true }
-  );
-};
-
+  const handleDelete = (eventId) => {
+    handleAction(
+      "Delete Event",
+      "Are you sure you want to delete this event?",
+      "Event deleted successfully.",
+      async () => await deleteEvent(eventId),
+      () => setEventsShown(events),
+    );
+  };
 
   useEffect(() => {
     setSelectedCategory("All");
@@ -135,7 +119,7 @@ export default function SearchScreen() {
       const catValue = getCategoryValueFromLabel(selectedCategory);
       scrollToItem(catValue);
       if (selectedCategory == "All") {
-        refreshEvents();
+        await refreshEvents();
         setEventsShown(events);
       } else {
         const type = getCategoryTypeFromValue(catValue);

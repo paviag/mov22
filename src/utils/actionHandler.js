@@ -4,7 +4,6 @@ const handleAction = async (
   actionName,
   warningText,
   successText,
-  error,
   actionFunction,
   onSuccess = () => {},
 ) => {
@@ -18,9 +17,8 @@ const handleAction = async (
           text: 'Accept',
           style: 'destructive',
           onPress: async () => {
-            await actionFunction();
-
-            if (error === undefined) {
+            const success = await actionFunction();
+            if (success) {
               Alert.alert('Success', successText, [
                 { 
                   text: 'OK', 

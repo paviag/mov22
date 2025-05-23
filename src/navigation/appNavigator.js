@@ -11,8 +11,8 @@ const AppNavigator = () => (
     tabBar={props => <CustomTabBar {...props} />} 
     screenOptions={{ headerShown: false }}
     >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Add New" component={AddNavigator} options={{ unmountOnBlur: true }} />
+    <Tab.Screen name="Home" component={HomeScreen} options={{ unmountOnBlur: true }} />
+    <Tab.Screen name="Add Navigator" component={AddNavigator} options={{ unmountOnBlur: true }} />
     <Tab.Screen name="Search" component={SearchScreen} />
   </Tab.Navigator>
 );

@@ -25,7 +25,7 @@ export default function FeedbackDashboard() {
   if (eventData?.ratings == undefined || loading) {
     return <LoadingScreen />;
   }
-
+  
   return (
     <ScrollView
       className="bg-white"
@@ -55,8 +55,8 @@ export default function FeedbackDashboard() {
                   className="bg-pink-600 h-full rounded-full"
                   style={{
                     width: `${
-                      (eventData.participants /
-                        (eventData.participants + eventData.availableSpots)) *
+                      ((eventData.participants - eventData.availableSpots) /
+                        eventData.participants) *
                       100
                     }%`,
                   }}
@@ -70,35 +70,43 @@ export default function FeedbackDashboard() {
             </View>
 
             <Text className="text-base font-semibold">Total Ratings</Text>
-
-            <View className="mt-3 mb-2 flex-col-reverse">
-              {Array.from(Array(5).keys()).map((index) => {
-                const percentage = `${Math.floor(
-                  (eventData.ratings.filter((rating) => rating === index + 1)
-                    .length /
-                    eventData.ratings.length) *
-                    100
-                )}%`;
-                return (
-                  <View className="flex-row items-center mb-2" key={index}>
-                    <Text className="text-base text-pink-800 w-8">
-                      {index + 1}
-                    </Text>
-                    <View className="flex-1 bg-white h-4 rounded-full border border-pink-300 overflow-hidden mx-2">
-                      <View
-                        className="bg-pink-600 h-full rounded-full"
-                        style={{
-                          width: percentage,
-                        }}
-                      />
+            {eventData.ratings && eventData.ratings.length > 0 ? (
+              <View className="mt-3 mb-2 flex-col-reverse">
+                {Array.from(Array(5).keys()).map((index) => {
+                  const percentage = `${
+                    Math.floor(
+                      (eventData.ratings.filter(
+                        (rating) => rating === index + 1
+                      ).length /
+                        eventData.ratings.length) *
+                        100
+                    ) ?? 0
+                  }%`;
+                  return (
+                    <View className="flex-row items-center mb-2" key={index}>
+                      <Text className="text-base text-pink-800 w-8">
+                        {index + 1}
+                      </Text>
+                      <View className="flex-1 bg-white h-4 rounded-full border border-pink-300 overflow-hidden mx-2">
+                        <View
+                          className="bg-pink-600 h-full rounded-full"
+                          style={{
+                            width: percentage,
+                          }}
+                        />
+                      </View>
+                      <Text className="text-xs text-pink-800 w-8 text-right">
+                        {percentage}
+                      </Text>
                     </View>
-                    <Text className="text-xs text-pink-800 w-8 text-right">
-                      {percentage}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
+                  );
+                })}
+              </View>
+            ) : (
+              <Text className="font-bold text-md text-center py-10 text-gray-500">
+                No ratings yet
+              </Text>
+            )}
           </View>
         </View>
       </View>

@@ -9,8 +9,7 @@ import LoadingScreen from "./loadingScreen";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToCategoryEdit } = useAppNavigation();
-  const { events, categories, loading, error, setError } =
-    useContext(AppContext);
+  const { events, categories, loading, error, setError } = useContext(AppContext);
 
   if (loading) {
     return <LoadingScreen />;
@@ -47,6 +46,7 @@ export default function HomeScreen() {
         <View className="bg-pink-200 w-full">
           <View className="bg-white rounded-tl-[55px] p-10 pb-40">
             <Text className="text-lg font-semibold">Explore categories</Text>
+            {categories && categories.length > 0 ? (
             <FlatList
               data={categories}
               horizontal={true}
@@ -64,7 +64,11 @@ export default function HomeScreen() {
               className="pt-2 pb-5"
               ItemSeparatorComponent={<View className="w-5" />}
             />
+            ) : (
+              <Text className="text-center text-gray-500 font-bold py-6">No categories found</Text>
+            )}
             <Text className="text-lg font-semibold">Most popular</Text>
+            {events && events.length > 0 ? (
             <FlatList
               data={events}
               horizontal={true}
@@ -78,6 +82,9 @@ export default function HomeScreen() {
               className="pt-2 pb-5"
               ItemSeparatorComponent={<View className="w-5" />}
             />
+            ) : (
+              <Text className="text-center text-gray-500 font-bold py-6">No events found</Text>
+            )}
           </View>
         </View>
       </View>

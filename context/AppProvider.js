@@ -12,17 +12,17 @@ export const AppContext = createContext({
   events: [],
   refreshEvents: () => {},
   getOneEvent: async (id) => {},
-  createEvent: async (data) => {},
-  updateEvent: async (data) => {},
-  deleteEvent: async (id) => {},
+  createEvent: async (data) => Boolean,
+  updateEvent: async (data) => Boolean,
+  deleteEvent: async (id) => Boolean,
   getEventsByType: async (type) => {},
   // category
   categories: [],
   refreshCategories: () => {},
   getOneCategory: async (id) => {},
-  createCategory: async (data) => {},
-  updateCategory: async (data) => {},
-  deleteCategory: async (id) => {},
+  createCategory: async (data) => Boolean,
+  updateCategory: async (data) => Boolean,
+  deleteCategory: async (id) => Boolean,
   getCategoryTypeFromValue: (value) => string,
   getCategoryValueFromLabel: (label) => number,
 });
@@ -36,6 +36,7 @@ export const AppProvider = ({ children }) => {
 
   // Initial fetch
   const fetchEvents = async () => {
+    console.log("fetch events")
     setLoading(true);
     try {
       const data = await eventService.getAllEvents();
@@ -49,6 +50,7 @@ export const AppProvider = ({ children }) => {
 
   // Initial fetch
   const fetchCategories = async () => {
+    console.log("fetch categories")
     setLoading(true);
     try {
       const data = await categoryService.getAllCategories();
@@ -113,8 +115,10 @@ export const AppProvider = ({ children }) => {
     try {
       await eventService.createEvent(data);
       await fetchEvents();
+      return true;
     } catch (err) {
       setError("Failed to create event.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -126,8 +130,10 @@ export const AppProvider = ({ children }) => {
     try {
       await categoryService.createCategory(data);
       await fetchCategories();
+      return true;
     } catch (err) {
       setError("Failed to create category.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -139,8 +145,10 @@ export const AppProvider = ({ children }) => {
     try {
       await eventService.updateEvent(event);
       await fetchEvents();
+      return true;
     } catch (err) {
       setError("Failed to update event.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -152,8 +160,10 @@ export const AppProvider = ({ children }) => {
     try {
       await categoryService.updateCategory(category);
       await fetchCategories();
+      return true;
     } catch (err) {
       setError("Failed to update category.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -166,9 +176,12 @@ export const AppProvider = ({ children }) => {
       const success = await eventService.deleteEvent(id);
       if (success) {
         setEvents((prev) => prev.filter((p) => p._id !== id));
+        return true;
       }
+      return false;
     } catch (err) {
       setError("Failed to delete event.");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -181,9 +194,12 @@ export const AppProvider = ({ children }) => {
       const success = await categoryService.deleteCategory(id);
       if (success) {
         await fetchCategories();
+        return true;
       }
+      return false;
     } catch (err) {
       setError("Failed to delete category.");
+      return false;
     } finally {
       setLoading(false);
     }

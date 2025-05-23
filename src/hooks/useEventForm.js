@@ -25,7 +25,7 @@ const useEventForm = (eventId, navigation) => {
     details: "",
     participants: 0,
     availableSpots: 0,
-    path: "",
+    path: "lib/identity01.png",
     isJoined: false,
   });
   const [subscribedNumber, setSubscribedNumber] = useState(0);
@@ -74,14 +74,13 @@ const useEventForm = (eventId, navigation) => {
     [eventData.date]
   );
 
-  const handleSubmit = async (navigation) => {
+  const handleSubmit = async () => {
     if (eventId !== undefined) {
       // update existing event
       handleAction(
         "Update Event",
         "Are you sure you want to overwrite event data?",
         "Changes saved.",
-        error,
         async () =>
           await updateEvent({
             ...eventData,
@@ -90,13 +89,15 @@ const useEventForm = (eventId, navigation) => {
       );
     } else {
       // create new event
-      await createEvent({ ...eventData, date: dateFormatter(eventData.date) });
-      Alert.alert("Success", "Event created successfully.", [
-        {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+      const success = await createEvent({ ...eventData, date: dateFormatter(eventData.date), availableSpots: eventData.participants });
+      if (success) {
+        Alert.alert("Success", "Event created successfully.", [
+          {
+            text: "OK",
+            onPress: () => navigation.goBack(),
+          },
+        ]);
+      }
     }
   };
 
