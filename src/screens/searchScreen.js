@@ -78,7 +78,6 @@ export default function SearchScreen() {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log("use eff search")
     const refreshData = async () => {
       await refreshCategories();
       await refreshEvents();

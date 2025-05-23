@@ -36,7 +36,6 @@ export const AppProvider = ({ children }) => {
 
   // Initial fetch
   const fetchEvents = async () => {
-    console.log("fetch events")
     setLoading(true);
     try {
       const data = await eventService.getAllEvents();
@@ -50,7 +49,6 @@ export const AppProvider = ({ children }) => {
 
   // Initial fetch
   const fetchCategories = async () => {
-    console.log("fetch categories")
     setLoading(true);
     try {
       const data = await categoryService.getAllCategories();
