@@ -18,6 +18,7 @@ export default function FeedbackDashboard() {
     const fetchEventData = async () => {
       const data = await getOneEvent(eventId);
       setEventData(data);
+      console.log ("Event Data:", eventData);
     };
     fetchEventData();
   }, [eventId]);
@@ -107,6 +108,40 @@ export default function FeedbackDashboard() {
                 No ratings yet
               </Text>
             )}
+             <Text className="text-base font-semibold">Comments</Text>
+            <View
+              style={{ maxHeight: 220 }} 
+              className="mt-3 mb-2"
+            >
+              <ScrollView
+                showsVerticalScrollIndicator={true}
+              >
+                {eventData.comments && eventData.comments.length > 0 ? (
+                  eventData.comments.map((comment, index) => (
+                    <View
+                      key={index}
+                      className="flex-row items-center bg-pink-50 rounded-xl p-4 mb-3 shadow-sm"
+                      style={{
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 2,
+                        elevation: 2,
+                      }}
+                    >
+                      {/* Icono de usuario anónimo */}
+                      <Text className="text-2xl mr-3">👤</Text>
+                      {/* Comentario */}
+                      <Text className="text-sm text-gray-700 flex-1">{comment}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text className="font-bold text-md text-center py-10 text-gray-500">
+                    No comments yet
+                  </Text>
+                )}
+              </ScrollView>
+            </View>
           </View>
         </View>
       </View>
