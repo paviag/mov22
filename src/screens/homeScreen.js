@@ -67,21 +67,25 @@ export default function HomeScreen() {
             ) : (
               <Text className="text-center text-gray-500 font-bold py-6">No categories found</Text>
             )}
-            <Text className="text-lg font-semibold">Most popular</Text>
+           <Text className="text-lg font-semibold">Most recent</Text>
             {events && events.length > 0 ? (
-            <FlatList
-              data={events}
-              horizontal={true}
-              keyExtractor={(item) => item._id}
-              renderItem={({ item }) => (
-                <EventItemHorizontal
-                  item={item}
-                  onPress={() => navigateToEventEdit(item._id)}
-                />
-              )}
-              className="pt-2 pb-5"
-              ItemSeparatorComponent={<View className="w-5" />}
-            />
+              <FlatList
+                data={
+                  [...events]
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, 10)
+                }
+                horizontal={true}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => (
+                  <EventItemHorizontal
+                    item={item}
+                    onPress={() => navigateToEventEdit(item._id)}
+                  />
+                )}
+                className="pt-2 pb-5"
+                ItemSeparatorComponent={<View className="w-5" />}
+              />
             ) : (
               <Text className="text-center text-gray-500 font-bold py-6">No events found</Text>
             )}
