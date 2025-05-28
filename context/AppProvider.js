@@ -169,19 +169,34 @@ export const AppProvider = ({ children }) => {
 
   // Delete an event by id
   const deleteEvent = async (id) => {
+    console.log("🗑️ Context deleteEvent called with id:", id);
     setLoading(true);
     try {
-      const success = await eventService.deleteEvent(id);
-      if (success) {
-        setEvents((prev) => prev.filter((p) => p._id !== id));
+      console.log("🌐 Calling eventService.deleteEvent...");
+      const result = await eventService.deleteEvent(id);
+      console.log("✅ eventService.deleteEvent result:", result);
+
+      if (result) {
+        console.log("🔄 Updating local state...");
+        // Actualizar el estado local inmediatamente
+        setEvents((prevEvents) => {
+          const updatedEvents = prevEvents.filter((event) => event._id !== id);
+          console.log("📊 Events count before:", prevEvents.length);
+          console.log("📊 Events count after:", updatedEvents.length);
+          return updatedEvents;
+        });
+        console.log("✅ Local state updated successfully");
         return true;
       }
+      console.log("❌ eventService returned falsy result");
       return false;
     } catch (err) {
+      console.error("❌ Error in context deleteEvent:", err);
       setError("Failed to delete event.");
       return false;
     } finally {
       setLoading(false);
+      console.log("🏁 deleteEvent process finished");
     }
   };
 

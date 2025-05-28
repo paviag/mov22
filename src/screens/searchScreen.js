@@ -1,4 +1,10 @@
-import { FlatList, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import EventItem from "../components/eventItem";
 import Text from "../components/text";
@@ -6,9 +12,8 @@ import { useEffect, useRef, useState, memo, useContext } from "react";
 import useAppNavigation from "../hooks/useAppNavigation";
 import { AppContext } from "../../context/AppProvider";
 import LoadingScreen from "./loadingScreen";
-import { Alert } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-import handleAction from "../utils/actionHandler";
+//import handleAction from "../utils/actionHandler";
 
 const CategoryItem = memo(({ item, selectedCategory, setSelectedCategory }) => (
   <TouchableOpacity
@@ -73,61 +78,146 @@ export default function SearchScreen() {
   } = useContext(AppContext);
   const [eventsShown, setEventsShown] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchText, setSearchText] = useState("");
   const { navigateToEventEdit } = useAppNavigation();
   const flatListRef = useRef(null);
   const isFocused = useIsFocused();
 
+  const filterEventsBySearch = (eventsList, searchQuery) => {
+    if (!searchQuery.trim()) return eventsList;
+
+    return eventsList.filter(
+      (event) =>
+        event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  // Efecto para cargar datos iniciales cuando la pantalla se enfoca
   useEffect(() => {
     const refreshData = async () => {
-      await refreshCategories();
       await refreshEvents();
     };
     if (isFocused) {
       refreshData();
-      setEventsShown(events);
     }
   }, [isFocused]);
+
+  // Efecto separado para filtrar eventos cuando cambian los datos
+  useEffect(() => {
+    const updateEventsShown = async () => {
+      let filteredEvents = [];
+
+      if (selectedCategory === "All") {
+        filteredEvents = events;
+      } else {
+        const catValue = getCategoryValueFromLabel(selectedCategory);
+        const type = getCategoryTypeFromValue(catValue);
+        filteredEvents = await getEventsByType(type);
+      }
+
+      // Aplicar filtro de búsqueda
+      const searchFilteredEvents = filterEventsBySearch(
+        filteredEvents,
+        searchText
+      );
+      setEventsShown(searchFilteredEvents);
+    };
+
+    if (events.length > 0 || selectedCategory !== "All") {
+      updateEventsShown();
+    }
+  }, [selectedCategory, searchText]); // Remover 'events' de las dependencias
+
+  // Efecto separado para actualizar eventos mostrados cuando cambian los eventos
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      const searchFilteredEvents = filterEventsBySearch(events, searchText);
+      setEventsShown(searchFilteredEvents);
+    }
+  }, [events]); // Solo depende de events
 
   const scrollToItem = (index) => {
     try {
       flatListRef.current?.scrollToIndex({ index, animated: true });
     } catch (e) {
       flatListRef.current?.scrollToOffset({
-        offset: index * 170, // Fallback to manual scroll
+        offset: index * 170,
         animated: true,
       });
     }
   };
 
   const handleDelete = (eventId) => {
-    handleAction(
-      "Delete Event",
-      "Are you sure you want to delete this event?",
-      "Event deleted successfully.",
-      async () => await deleteEvent(eventId),
-      () => setEventsShown(events),
-    );
+    console.log("🗑️ HandleDelete called with eventId:", eventId);
+    console.log("📊 Current events count:", events.length);
+    console.log("🚨 About to show Alert...");
+
+    try {
+      Alert.alert(
+        "Delete Event",
+        "Are you sure you want to delete this event?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+            onPress: () => {
+              console.log("❌ User cancelled deletion");
+            },
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              console.log("🚀 USER PRESSED DELETE BUTTON!");
+              console.log("🚀 Starting delete process for:", eventId);
+
+              try {
+                // Eliminar el evento usando la función del contexto
+                console.log("📞 Calling deleteEvent from context...");
+                const success = await deleteEvent(eventId);
+                console.log("✅ Delete result:", success);
+
+                if (success) {
+                  console.log("🔄 Events updated automatically by context");
+                  console.log("📊 New events count:", events.length);
+
+                  // Actualizar manualmente la lista filtrada
+                  const updatedEvents = events.filter(
+                    (event) => event._id !== eventId
+                  );
+                  const searchFilteredEvents = filterEventsBySearch(
+                    updatedEvents,
+                    searchText
+                  );
+                  setEventsShown(searchFilteredEvents);
+
+                  Alert.alert("Success", "Event deleted successfully.");
+                } else {
+                  console.log("❌ Delete returned false");
+                  throw new Error("Delete operation returned false");
+                }
+              } catch (error) {
+                console.error("❌ Error deleting event:", error);
+                Alert.alert(
+                  "Error",
+                  `Failed to delete event: ${error.message || "Unknown error"}`
+                );
+              }
+            },
+          },
+        ]
+      );
+      console.log("✅ Alert.alert called successfully");
+    } catch (error) {
+      console.error("❌ Error showing Alert:", error);
+    }
   };
 
   useEffect(() => {
     setSelectedCategory("All");
   }, []);
-
-  useEffect(() => {
-    const updateEventsShown = async () => {
-      const catValue = getCategoryValueFromLabel(selectedCategory);
-      scrollToItem(catValue);
-      if (selectedCategory == "All") {
-        await refreshEvents();
-        setEventsShown(events);
-      } else {
-        const type = getCategoryTypeFromValue(catValue);
-        const newEventsShown = await getEventsByType(type);
-        setEventsShown(newEventsShown);
-      }
-    };
-    updateEventsShown();
-  }, [selectedCategory]);
 
   return (
     <View className="flex-1">
@@ -138,6 +228,8 @@ export default function SearchScreen() {
             placeholder="Search events..."
             placeholderTextColor="slategray"
             style={{ fontFamily: "Nunito_400Regular" }}
+            value={searchText}
+            onChangeText={setSearchText}
           />
           <MaterialIcons name="search" color="darkslategray" size={30} />
         </View>
@@ -181,3 +273,4 @@ export default function SearchScreen() {
     </View>
   );
 }
+
