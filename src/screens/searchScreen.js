@@ -150,10 +150,6 @@ export default function SearchScreen() {
   };
 
   const handleDelete = (eventId) => {
-    console.log("🗑️ HandleDelete called with eventId:", eventId);
-    console.log("📊 Current events count:", events.length);
-    console.log("🚨 About to show Alert...");
-
     try {
       Alert.alert(
         "Delete Event",
@@ -162,27 +158,15 @@ export default function SearchScreen() {
           {
             text: "Cancel",
             style: "cancel",
-            onPress: () => {
-              console.log("❌ User cancelled deletion");
-            },
           },
           {
             text: "Delete",
             style: "destructive",
             onPress: async () => {
-              console.log("🚀 USER PRESSED DELETE BUTTON!");
-              console.log("🚀 Starting delete process for:", eventId);
-
               try {
                 // Eliminar el evento usando la función del contexto
-                console.log("📞 Calling deleteEvent from context...");
                 const success = await deleteEvent(eventId);
-                console.log("✅ Delete result:", success);
-
                 if (success) {
-                  console.log("🔄 Events updated automatically by context");
-                  console.log("📊 New events count:", events.length);
-
                   // Actualizar manualmente la lista filtrada
                   const updatedEvents = events.filter(
                     (event) => event._id !== eventId
@@ -195,11 +179,9 @@ export default function SearchScreen() {
 
                   Alert.alert("Success", "Event deleted successfully.");
                 } else {
-                  console.log("❌ Delete returned false");
                   throw new Error("Delete operation returned false");
                 }
               } catch (error) {
-                console.error("❌ Error deleting event:", error);
                 Alert.alert(
                   "Error",
                   `Failed to delete event: ${error.message || "Unknown error"}`
@@ -209,9 +191,8 @@ export default function SearchScreen() {
           },
         ]
       );
-      console.log("✅ Alert.alert called successfully");
     } catch (error) {
-      console.error("❌ Error showing Alert:", error);
+      console.log("Error showing Alert:", error);
     }
   };
 

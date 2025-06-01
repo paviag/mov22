@@ -1,4 +1,4 @@
-import { Alert, FlatList, ScrollView, View } from "react-native";
+import { Alert, FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 import Text from "../components/text";
 import CategoryItemHorizontal from "../components/categoryItemHorizontal";
 import EventItemHorizontal from "../components/eventItemHorizontal";
@@ -6,10 +6,11 @@ import useAppNavigation from "../hooks/useAppNavigation";
 import { useContext } from "react";
 import { AppContext } from "../../context/AppProvider";
 import LoadingScreen from "./loadingScreen";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToCategoryEdit } = useAppNavigation();
-  const { events, categories, loading, error, setError } =
+  const { events, categories, loading, error, setError, refreshCategories, refreshEvents } =
     useContext(AppContext);
 
   if (loading) {
@@ -46,7 +47,13 @@ export default function HomeScreen() {
 
         <View className="bg-pink-200 w-full">
           <View className="bg-white rounded-tl-[55px] p-10 pb-40">
-            <Text className="text-lg font-semibold">Explore categories</Text>
+            <View className="flex-row gap-1 items-center">
+              <Text className="text-lg font-semibold">Explore categories</Text>
+              <TouchableOpacity onPress={refreshCategories}>
+                <MaterialIcons name="refresh" size={22} />
+              </TouchableOpacity>
+            </View>
+            
             {categories && categories.length > 0 ? (
               <FlatList
                 data={categories}
@@ -72,7 +79,12 @@ export default function HomeScreen() {
                 No categories found
               </Text>
             )}
-            <Text className="text-lg font-semibold">Most recent</Text>
+            <View className="flex-row gap-1 items-center">
+              <Text className="text-lg font-semibold">Most recent</Text>
+              <TouchableOpacity onPress={refreshEvents}>
+                <MaterialIcons name="refresh" size={22} />
+              </TouchableOpacity>
+            </View>
             {events && events.length > 0 ? (
               <FlatList
                 data={[...events]
