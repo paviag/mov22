@@ -10,6 +10,14 @@
 
 The **mov22** directory contains a React Native implementation of the Punto G platform, designed to facilitate the creation, management, and discovery of sexual education events and workshops. This app provides an intuitive interface for users to explore educational content, manage events, and engage with the community.
 
+## 🎥 Demo Video
+
+ <p align="center"
+  <a href="https://youtu.be/fFWO2N6fPK8">
+    <img src="https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg" width="600" alt="Demo Video">
+  </a>
+</p>
+
 ## ✨ Features
 
 - 📅 **Event Management** - Create, edit, and delete educational events
@@ -204,7 +212,3 @@ This React Native app integrates with:
 This project is part of the Punto G educational platform initiative.
 
 ---
-
-<p align="center">
-  Built with ❤️ using React Native and Expo
-</p>
