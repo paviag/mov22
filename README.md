@@ -12,10 +12,8 @@ The **mov22** directory contains a React Native implementation of the Punto G pl
 
 ## 🎥 Demo Video
 
- <p align="center"
-  <a href="https://youtu.be/fFWO2N6fPK8">
-    <img src="https://img.youtube.com/vi/fFWO2N6fPK8/maxresdefault.jpg" width="600" alt="Demo Video">
-  </a>
+<p align="center">
+  <iframe width="600" height="338" src="https://www.youtube.com/embed/fFWO2N6fPK8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </p>
 
 ## ✨ Features
