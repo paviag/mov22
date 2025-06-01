@@ -9,7 +9,8 @@ import LoadingScreen from "./loadingScreen";
 
 export default function HomeScreen() {
   const { navigateToEventEdit, navigateToCategoryEdit } = useAppNavigation();
-  const { events, categories, loading, error, setError } = useContext(AppContext);
+  const { events, categories, loading, error, setError } =
+    useContext(AppContext);
 
   if (loading) {
     return <LoadingScreen />;
@@ -47,34 +48,36 @@ export default function HomeScreen() {
           <View className="bg-white rounded-tl-[55px] p-10 pb-40">
             <Text className="text-lg font-semibold">Explore categories</Text>
             {categories && categories.length > 0 ? (
-            <FlatList
-              data={categories}
-              horizontal={true}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => (
-                <CategoryItemHorizontal
-                  item={item}
-                  onPress={() => {
-                    if (item.label != "All") {
-                      navigateToCategoryEdit(item._id);
-                    }
-                  }}
-                />
-              )}
-              className="pt-2 pb-5"
-              ItemSeparatorComponent={<View className="w-5" />}
-            />
+              <FlatList
+                data={categories}
+                horizontal={true}
+                keyExtractor={(item, index) =>
+                  item._id ? `cat-${item._id}-${index}` : `category-${index}`
+                }
+                renderItem={({ item }) => (
+                  <CategoryItemHorizontal
+                    item={item}
+                    onPress={() => {
+                      if (item.label != "All") {
+                        navigateToCategoryEdit(item._id);
+                      }
+                    }}
+                  />
+                )}
+                className="pt-2 pb-5"
+                ItemSeparatorComponent={<View className="w-5" />}
+              />
             ) : (
-              <Text className="text-center text-gray-500 font-bold py-6">No categories found</Text>
+              <Text className="text-center text-gray-500 font-bold py-6">
+                No categories found
+              </Text>
             )}
-           <Text className="text-lg font-semibold">Most recent</Text>
+            <Text className="text-lg font-semibold">Most recent</Text>
             {events && events.length > 0 ? (
               <FlatList
-                data={
-                  [...events]
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 10)
-                }
+                data={[...events]
+                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                  .slice(0, 10)}
                 horizontal={true}
                 keyExtractor={(item) => item._id}
                 renderItem={({ item }) => (
@@ -87,7 +90,9 @@ export default function HomeScreen() {
                 ItemSeparatorComponent={<View className="w-5" />}
               />
             ) : (
-              <Text className="text-center text-gray-500 font-bold py-6">No events found</Text>
+              <Text className="text-center text-gray-500 font-bold py-6">
+                No events found
+              </Text>
             )}
           </View>
         </View>

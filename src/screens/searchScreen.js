@@ -257,7 +257,9 @@ export default function SearchScreen() {
       ) : (
         <FlatList
           data={eventsShown}
-          keyExtractor={(item) => item._id + item.type}
+          keyExtractor={(item, index) =>
+            item._id ? `${item._id}-${index}` : `event-${index}`
+          }
           renderItem={({ item }) => (
             <EventItem
               item={item}
@@ -273,4 +275,3 @@ export default function SearchScreen() {
     </View>
   );
 }
-
